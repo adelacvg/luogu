@@ -5,6 +5,7 @@ constexpr const int maxn = 1000000;
 int fa[maxn][40],dep[maxn];
 vector<int> e[maxn];
 int n,m;
+vector<int> v;
 
 void dfs(int now,int father)
 {
@@ -47,6 +48,8 @@ int dis(int a,int b)
 }
 int main()
 {
+    ios::sync_with_stdio(0);
+    cin.tie(0);
     cin>>n>>m;
     int u,v;
     for(int i=1;i<n;i++)
@@ -60,8 +63,18 @@ int main()
     {
         int a,b,c;
         cin>>a>>b>>c;
-        int p=lca(lca(a,b),c);
-        int cost=dis(p,a)+dis(p,b)+dis(p,c);
+        vector<int> p_candidate{lca(a,b),lca(b,c),lca(a,c)};
+        int cost=INT_MAX;
+        int p=1;
+        for(auto p_t:p_candidate)
+        {
+            int cost_t=dis(p_t,a)+dis(p_t,b)+dis(p_t,c);
+            if(cost_t<cost)
+            {
+                cost=cost_t;
+                p=p_t;
+            }
+        }
         cout<<p<<" "<<cost<<'\n';
     }
 }
