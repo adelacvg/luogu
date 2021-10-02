@@ -1,17 +1,19 @@
 #include<bits/stdc++.h>
 using namespace std;
-const int maxn = 3e5+10;
+using i64 = unsigned long long;
+const int maxn = 1e6+10;
 vector<int> e[maxn];
 int sz[maxn],sz2[maxn];
-int hson[maxn],hson2[maxn],hson_root[maxn];
+int hson[maxn],hson2[maxn],hson_root[maxn],pr[maxn];
 int hsonjmp[maxn][20];
-int ans;
+i64 ans;
 int f[maxn];
 
 
 void dfs1(int x,int fa)
 {
     sz[x]=1;
+    pr[x]=fa;
     for(auto son: e[x])
     {
         if(son==fa)
@@ -36,7 +38,7 @@ void dfs1(int x,int fa)
 }
 int judge(int x,int sum)
 {
-    return x*(max(hson2[hson_root[x]],sum-sz2[x])<=sum/2);
+    return x*(max(sz2[hson_root[x]],sum-sz2[x])<=sum/2);
 }
 void dfs2(int x,int fa)
 {
@@ -64,14 +66,21 @@ void dfs2(int x,int fa)
             if(sz2[x]-sz2[hsonjmp[t][i]]<=sz2[x]/2)
                 t=hsonjmp[t][i];
         }
-        ans+=judge(hson_root[t],hson2[son])+judge(t,sz2[son])+judge(f[t],sz2[son]);
+        ans+=judge(hson_root[t],sz2[x])+judge(t,sz2[x])+judge(f[t],sz2[x]);
+        t=son;
+        for(int i=19;i>=0;i--)
+        {
+            if(sz2[son]-sz2[hsonjmp[t][i]]<=sz2[son]/2)
+                t=hsonjmp[t][i];
+        }
+        ans+=judge(hson_root[t],sz2[son])+judge(t,sz2[son])+judge(f[t],sz2[son]);
         f[x]=son;
         dfs2(son,x);
     }
     hson_root[x]=hsonjmp[x][0]=hson[x];
-    f[x]=fa;
+    f[x]=pr[x];
     for(int i=1;i<=19;i++)
-        hsonjmp[x][i]=hsonjmp[hsonjmp[x][i-1]][i];
+        hsonjmp[x][i]=hsonjmp[hsonjmp[x][i-1]][i-1];
     sz2[x]=sz[x];
 }
 int main()
@@ -85,6 +94,12 @@ int main()
         int n;
         cin>>n;
         for(int i=1;i<=n;i++)
+        {
+            hson[i]=0;
+            f[i]=0;
+            pr[i]=0;
+        }
+        for(int i=1;i<=n;i++)
             e[i].clear();
         for(int i=1;i<n;i++)
         {
@@ -94,6 +109,12 @@ int main()
             e[v].emplace_back(u);
         }
         dfs1(1,0);
+        for(int i=1;i<=n;i++)
+        {
+            sz2[i]=sz[i];
+            hson_root[i]=hson[i];
+            f[i]=pr[i];
+        }
         dfs2(1,0);
         cout<<ans<<'\n';
     }
