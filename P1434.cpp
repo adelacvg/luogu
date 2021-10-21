@@ -9,16 +9,17 @@ int n,m;
 
 void dfs(int x,int y)
 {
+    if(cnt[x][y])
+        return;
+    cnt[x][y]=1;
     for(int i=0;i<4;i++)
     {
         auto tx=x+dx[i];
         auto ty=y+dy[i];
-
-        if(tx>=1&&tx<=n&&ty>=1&&ty<=m&&mp[tx][ty]<mp[x][y]&&cnt[x][y]+1>cnt[tx][ty])
+        if(tx>=1&&tx<=n&&ty>=1&&ty<=m&&mp[tx][ty]<mp[x][y])
         {
-            cnt[tx][ty]=cnt[x][y]+1;
-            ans=max(ans,cnt[tx][ty]);
             dfs(tx,ty);
+            cnt[x][y]=max(cnt[x][y],cnt[tx][ty]+1);
         }
     }
 }
@@ -26,22 +27,20 @@ void dfs(int x,int y)
 int main()
 {
     cin>>n>>m;
-    int stx=0,sty=0;
-    int t=0;
     for(int i=1;i<=n;i++)
     {
         for(int j=1;j<=m;j++)
         {
             cin>>mp[i][j];
-            if(mp[i][j]>t)
-            {
-                t=mp[i][j];
-                stx=i;
-                sty=j;
-            }
         }
     }
-    cnt[stx][sty]=1;
-    dfs(stx,sty);
+    for(int i=1;i<=n;i++)
+    {
+        for(int j=1;j<=m;j++)
+        {
+            dfs(i,j);
+            ans=max(ans,cnt[i][j]);
+        }
+    }
     cout<<ans<<endl;
 }
